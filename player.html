@@ -46,7 +46,7 @@
 			import { Frame } from './Frame.js';
 
 			const frame = new Frame();
-			frame.resources.set( 'dom', document.getElementById( 'container' ) );
+			container.appendChild( frame.domElement );
 
 			// Play button
 

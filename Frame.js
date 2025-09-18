@@ -129,9 +129,7 @@ function Player() {
 
 }
 
-function Resources() {
-
-	const resources = {};
+function Resources( resources = {} ) {
 
 	return {
 
@@ -515,7 +513,11 @@ class Frame {
 		this.scripts = [];
 		this.effects = [];
 
-		this.resources = new Resources();
+		// TODO: Is there a better default element?
+		this.domElement = document.createElement( 'div' );
+		this.domElement.style.height = '100%';
+
+		this.resources = new Resources( { dom: this.domElement } );
 		this.timeline = new Timeline();
 		this.player = new Player();
 

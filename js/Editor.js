@@ -92,50 +92,32 @@ function Editor() {
 
 	var scope = this;
 
+	function updateTimeline() {
+
+		try {
+
+			scope.timeline.update( scope.player.currentTime );
+
+		} catch ( e ) {
+
+			console.error( e );
+
+		}
+
+	}
+
 	this.signals.animationModified.add( function () {
 
 		scope.timeline.reset();
 		scope.timeline.sort();
 
-		try {
-
-			scope.timeline.update( scope.player.currentTime );
-
-		} catch ( e ) {
-
-			console.error( e );
-
-		}
+		updateTimeline();
 
 	} );
 
-	this.signals.effectCompiled.add( function () {
-
-		try {
-
-			scope.timeline.update( scope.player.currentTime );
-
-		} catch ( e ) {
-
-			console.error( e );
-
-		}
-
-	} );
-
-	this.signals.timeChanged.add( function () {
-
-		try {
-
-			scope.timeline.update( scope.player.currentTime );
-
-		} catch ( e ) {
-
-			console.error( e );
-
-		}
-
-	} );
+	this.signals.effectCompiled.add( updateTimeline );
+	this.signals.timeChanged.add( updateTimeline );
+	this.signals.windowResized.add( updateTimeline ); // TODO: Doesn't work?
 
 	// Animate
 

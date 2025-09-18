@@ -23,6 +23,8 @@ function Viewport( editor ) {
 		if ( element.mozRequestFullScreen ) element.mozRequestFullScreen();
 		if ( element.webkitRequestFullscreen ) element.webkitRequestFullscreen();
 
+		signals.windowResized.dispatch();
+
 	} );
 
 	function clear () {

@@ -2,11 +2,12 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { REVISION, Player, Resources, Code, Animation, Timeline, Frame } from '../Frame.js';
+import { REVISION, Frame, Code, Animation } from '../Frame.js';
 import { Config } from './Config.js';
 
 function Editor() {
 
+	// TODO Update to newer signals?
 	const Signal = signals.Signal;
 
 	this.signals = {
@@ -75,28 +76,20 @@ function Editor() {
 	};
 
 	this.config = new Config();
-
-	this.player = new Player();
-	this.resources = new Resources();
-
-	this.name = '';
-	this.duration = 120;
-
-	this.scripts = [];
-	this.effects = [];
-	this.timeline = new Timeline();
-
+	this.frame = new Frame();
 	this.selected = null;
 
 	// signals
 
-	var scope = this;
+	const scope = this;
+	const player = this.frame.player;
+	const timeline = this.frame.timeline;
 
 	function updateTimeline() {
 
 		try {
 
-			scope.timeline.update( scope.player.currentTime );
+			timeline.update( player.currentTime );
 
 		} catch ( e ) {
 
@@ -108,8 +101,8 @@ function Editor() {
 
 	this.signals.animationModified.add( function () {
 
-		scope.timeline.reset();
-		scope.timeline.sort();
+		timeline.reset();
+		timeline.sort();
 
 		updateTimeline();
 
@@ -117,7 +110,7 @@ function Editor() {
 
 	this.signals.effectCompiled.add( updateTimeline );
 	this.signals.timeChanged.add( updateTimeline );
-	this.signals.windowResized.add( updateTimeline ); // TODO: Doesn't work?
+	this.signals.windowResized.add( updateTimeline ); // TODO: Doesn't render?
 
 	// Animate
 
@@ -125,11 +118,11 @@ function Editor() {
 
 	function animate( time ) {
 
-		scope.player.tick( time - prevTime );
+		player.tick( time - prevTime );
 
-		if ( scope.player.isPlaying ) {
+		if ( player.isPlaying ) {
 
-			scope.signals.timeChanged.dispatch( scope.player.currentTime );
+			scope.signals.timeChanged.dispatch( player.currentTime );
 
 		}
 
@@ -147,28 +140,28 @@ Editor.prototype = {
 
 	play: function () {
 
-		this.player.play();
+		this.frame.player.play();
 		this.signals.playingChanged.dispatch( true );
 
 	},
 
 	stop: function () {
 
-		this.player.pause();
+		this.frame.player.pause();
 		this.signals.playingChanged.dispatch( false );
 
 	},
 
 	setName: function ( name ) {
 
-		this.name = name;
+		this.frame.name = name;
 		this.signals.nameChanged.dispatch();
 
 	},
 
 	setDuration: function ( duration ) {
 
-		this.duration = duration;
+		this.frame.duration = duration;
 		this.signals.durationChanged.dispatch();
 
 	},
@@ -177,8 +170,8 @@ Editor.prototype = {
 
 		location.hash = time.toFixed( 4 );
 
-		this.player.currentTime = Math.max( 0, Math.min( this.duration, time ) );
-		this.signals.timeChanged.dispatch( this.player.currentTime );
+		this.frame.player.currentTime = Math.max( 0, Math.min( this.frame.duration, time ) );
+		this.signals.timeChanged.dispatch( this.frame.player.currentTime );
 
 	},
 
@@ -188,7 +181,7 @@ Editor.prototype = {
 
 		try {
 
-			await script.compile( this.resources, this.player );
+			await script.compile( this.frame.resources, this.frame.player );
 
 		} catch ( e ) {
 
@@ -196,16 +189,16 @@ Editor.prototype = {
 
 		}
 
-		this.scripts.push( script );
+		this.frame.scripts.push( script );
 		this.signals.scriptAdded.dispatch();
 
 	},
 
 	removeScript: function ( script ) {
 
-		const index = this.scripts.indexOf( script );
+		const index = this.frame.scripts.indexOf( script );
 
-		this.scripts.splice( index, 1 );
+		this.frame.scripts.splice( index, 1 );
 		this.signals.scriptRemoved.dispatch();
 
 	},
@@ -225,7 +218,7 @@ Editor.prototype = {
 
 	createScript: function () {
 
-		this.scripts.push( new Code( { name: 'Unnamed', source: '' } ) );
+		this.frame.scripts.push( new Code( { name: 'Unnamed', source: '' } ) );
 		this.signals.scriptAdded.dispatch();
 
 	},
@@ -234,7 +227,7 @@ Editor.prototype = {
 
 		this.signals.scriptsCleared.dispatch();
 
-		const scripts = this.scripts;
+		const scripts = this.frame.scripts;
 
 		for ( let i = 0; i < scripts.length; i ++ ) {
 
@@ -242,7 +235,7 @@ Editor.prototype = {
 
 			try {
 
-				await script.compile( this.resources, this.player );
+				await script.compile( this.frame.resources, this.frame.player );
 
 			} catch ( e ) {
 
@@ -252,7 +245,7 @@ Editor.prototype = {
 
 		}
 
-		const effects = this.effects;
+		const effects = this.frame.effects;
 
 		for ( let i = 0; i < effects.length; i ++ ) {
 
@@ -260,7 +253,7 @@ Editor.prototype = {
 
 			try {
 
-				await effect.compile( this.resources, this.player );
+				await effect.compile( this.frame.resources, this.frame.player );
 
 			} catch ( e ) {
 
@@ -283,20 +276,20 @@ Editor.prototype = {
 
 	addEffect: function ( effect ) {
 
-		makeNameUnique( this.effects, effect );
+		makeNameUnique( this.frame.effects, effect );
 
-		this.effects.push( effect );
+		this.frame.effects.push( effect );
 		this.signals.effectAdded.dispatch( effect );
 
 	},
 
 	removeEffect: function ( effect ) {
 
-		var index = this.effects.indexOf( effect );
+		var index = this.frame.effects.indexOf( effect );
 
 		if ( index >= 0 ) {
 
-			this.effects.splice( index, 1 );
+			this.frame.effects.splice( index, 1 );
 			this.signals.effectRemoved.dispatch( effect );
 
 		}
@@ -320,7 +313,7 @@ Editor.prototype = {
 
 		try {
 
-			await effect.compile( this.resources, this.player );
+			await effect.compile( this.frame.resources, this.frame.player );
 
 		} catch ( e ) {
 
@@ -337,8 +330,8 @@ Editor.prototype = {
 	cleanEffects: function () {
 
 		var scope = this;
-		var effects = this.effects.slice( 0 );
-		var animations = this.timeline.animations;
+		var effects = this.frame.effects.slice( 0 );
+		var animations = this.frame.timeline.animations;
 
 		effects.forEach( function ( effect, i ) {
 
@@ -379,7 +372,7 @@ Editor.prototype = {
 
 		}
 
-		this.timeline.add( animation );
+		this.frame.timeline.add( animation );
 		this.signals.animationAdded.dispatch( animation );
 
 	},
@@ -395,7 +388,7 @@ Editor.prototype = {
 
 	removeAnimation: function ( animation ) {
 
-		this.timeline.remove( animation );
+		this.frame.timeline.remove( animation );
 		this.signals.animationRemoved.dispatch( animation );
 
 	},
@@ -442,23 +435,29 @@ Editor.prototype = {
 
 	clear: function () {
 
-		this.player.setAudio( null );
+		const frame = this.frame;
+		const signals = this.signals;
 
-		this.name = '';
-		this.duration = 120;
+		frame.player.setAudio( null );
 
-		this.scripts = [];
-		this.effects = [];
+		frame.name = '';
+		frame.duration = 120;
 
-		while ( this.timeline.animations.length > 0 ) {
+		frame.scripts = [];
+		frame.effects = [];
 
-			this.removeAnimation( this.timeline.animations[ 0 ] );
+		frame.player.playbackRate = 1;
+
+		while ( frame.timeline.animations.length > 0 ) {
+
+			this.removeAnimation( frame.timeline.animations[ 0 ] );
 
 		}
 
-		this.timeline.reset();
+		frame.resources.clear();
+		frame.timeline.reset();
 
-		this.signals.editorCleared.dispatch();
+		signals.editorCleared.dispatch();
 
 	},
 
@@ -471,8 +470,8 @@ Editor.prototype = {
 		const frame = new Frame();
 		frame.fromJSON( json );
 
-		this.name = frame.name;
-		this.duration = frame.duration;
+		this.frame.name = frame.name;
+		this.frame.duration = frame.duration;
 
 		for ( const script of frame.scripts ) {
 			await this.addScript( script );
@@ -493,8 +492,8 @@ Editor.prototype = {
 		const frame = new Frame();
 		frame.fromMarkdown( markdown );
 
-		this.name = frame.name;
-		this.duration = frame.duration;
+		this.frame.name = frame.name;
+		this.frame.duration = frame.duration;
 
 		for ( const script of frame.scripts ) {
 			await this.addScript( script );
@@ -512,16 +511,18 @@ Editor.prototype = {
 
 	toMarkdown: function () {
 
+		const frame = this.frame;
+
 		let markdown = `<!-- Frame.js Script r${ REVISION } -->\n\n`;
 		
-		markdown += `# ${ this.name }\n\n`;
+		markdown += `# ${ frame.name }\n\n`;
 		
 		markdown += '## Config\n\n';
-		markdown += `* Duration: ${ this.duration }\n\n`;
+		markdown += `* Duration: ${ frame.duration }\n\n`;
 		
-		if ( this.scripts.length > 0 ) {
+		if ( frame.scripts.length > 0 ) {
 			markdown += '## Setup\n\n';
-			for ( const script of this.scripts ) {
+			for ( const script of frame.scripts ) {
 				markdown += `### ${ script.name }\n\n`;
 				markdown += '```js\n';
 				markdown += script.source;
@@ -529,9 +530,9 @@ Editor.prototype = {
 			}
 		}
 		
-		if ( this.effects.length > 0 ) {
+		if ( frame.effects.length > 0 ) {
 			markdown += '## Effects\n\n';
-			for ( const effect of this.effects ) {
+			for ( const effect of frame.effects ) {
 				markdown += `### ${ effect.name }\n\n`;
 				markdown += '```js\n';
 				markdown += effect.source;
@@ -539,9 +540,9 @@ Editor.prototype = {
 			}
 		}
 		
-		if ( this.timeline.animations.length > 0 ) {
+		if ( frame.timeline.animations.length > 0 ) {
 			markdown += '## Animations\n\n';
-			for ( const animation of this.timeline.animations ) {
+			for ( const animation of frame.timeline.animations ) {
 				markdown += `### ${ animation.name }\n\n`;
 				markdown += `* start: ${ animation.start }\n`;
 				markdown += `* end: ${ animation.end }\n`;

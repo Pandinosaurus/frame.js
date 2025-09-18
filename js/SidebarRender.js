@@ -6,7 +6,7 @@ import { UIBreak, UIButton, UIInteger, UIPanel, UIProgress, UIRow, UIText } from
 
 function SidebarRender( editor ) {
 
-	var signals = editor.signals;
+	const frame = editor.frame;
 
 	var container = new UIPanel();
 	container.setId( 'render' );
@@ -63,8 +63,8 @@ function SidebarRender( editor ) {
 		progress.setDisplay( '' );
 		progress.setValue( 0 );
 
-		const player = editor.player;
-		const resources = editor.resources;
+		const player = frame.player;
+		const resources = frame.resources;
 
 		const renderer = resources.get( 'renderer' );
 		renderer.setPixelRatio( 1 );

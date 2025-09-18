@@ -141,14 +141,20 @@ function Resources( resources = {} ) {
 
 		set: function ( name, resource ) {
 
-			if ( 'name' in resources ) {
+			if ( name in resources ) {
 
-				console.error( 'Resource already exists: ' + name );
+				console.error( '[FRAME] Resource already exists: ' + name );
 				return;
 
 			}
 
 			resources[ name ] = resource;
+
+		},
+
+		clear: function () {
+
+			resources = { dom: resources.dom };
 
 		}
 
@@ -889,4 +895,4 @@ WebAudio.getContext = function() {
 // TODO: Pass it to the effect
 window.WebAudio = WebAudio;
 
-export { REVISION, Frame, Code, Animation, Resources, Timeline, Player };
+export { REVISION, Frame, Code, Animation };

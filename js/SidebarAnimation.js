@@ -6,7 +6,8 @@ import { UIButton, UICheckbox, UIColor, UIHorizontalRule, UIInput, UIInteger, UI
 
 function SidebarAnimation( editor ) {
 
-	var signals = editor.signals;
+	const frame = editor.frame;
+	const signals = editor.signals;
 
 	var container = new UIPanel();
 	container.setId( 'animation' );
@@ -275,7 +276,7 @@ function SidebarAnimation( editor ) {
 		row.add( new UIText( 'Effect' ).setWidth( '90px' ) );
 		container.add( row );
 
-		var effects = editor.effects;
+		var effects = frame.effects;
 		var options = {};
 
 		for ( var i = 0; i < effects.length; i ++ ) {
@@ -288,8 +289,8 @@ function SidebarAnimation( editor ) {
 		effectsSelect.setOptions( options ).setValue( effects.indexOf( selected.effect ) );
 		effectsSelect.onChange( function () {
 
-			editor.timeline.reset();
-			selected.effect = editor.effects[ this.getValue() ];
+			frame.timeline.reset();
+			selected.effect = frame.effects[ this.getValue() ];
 
 			signals.animationModified.dispatch( selected );
 

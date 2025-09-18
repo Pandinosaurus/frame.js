@@ -6,13 +6,12 @@ import { UIPanel } from './libs/ui.js';
 
 function Viewport( editor ) {
 
-	var scope = this;
 	var signals = editor.signals;
 
 	var container = this.container = new UIPanel();
 	container.setId( 'viewport' );
 
-	editor.resources.set( 'dom', container.dom );
+	container.dom.appendChild( editor.frame.domElement );
 
 	editor.signals.fullscreen.add( function () {
 
@@ -27,13 +26,24 @@ function Viewport( editor ) {
 
 	} );
 
-	function clear () {
+	function clear() {
 
-		var dom = container.dom;
+		const dom = editor.frame.domElement;
+
+		// Remove elements
 
 		while ( dom.children.length ) {
 
 			dom.removeChild( dom.lastChild );
+
+		}
+
+		// Reset styles
+
+		for ( var i = 1; i < dom.style.length; i ++ ) {
+
+			const name = dom.style[ i ];
+			dom.style[ name ] = '';
 
 		}
 

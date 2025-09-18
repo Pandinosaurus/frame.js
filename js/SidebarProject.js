@@ -2,11 +2,12 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIBreak, UIButton, UIDiv, UIInput, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
+import { UIBreak, UIButton, UIDiv, UIInput, UIPanel, UIRow, UIText } from './libs/ui.js';
 
 function SidebarProject( editor ) {
 
-	var signals = editor.signals;
+	const frame = editor.frame;
+	const signals = editor.signals;
 
 	var container = new UIPanel();
 	container.setId( 'project' );
@@ -22,7 +23,7 @@ function SidebarProject( editor ) {
 	row.add( new UIText( 'Name' ).setWidth( '90px' ) );
 	container.add( row );
 
-	var name = new UIInput( editor.name ).setWidth( '130px' );
+	var name = new UIInput( frame.name ).setWidth( '130px' );
 	name.onChange( function () {
 		editor.setName( this.getValue() );
 	} );
@@ -64,7 +65,7 @@ function SidebarProject( editor ) {
 
 	function buildScript( id ) {
 
-		var script = editor.scripts[ id ];
+		var script = frame.scripts[ id ];
 
 		var div = new UIDiv().setMarginBottom( '4px' );
 
@@ -121,8 +122,8 @@ function SidebarProject( editor ) {
 
 		await editor.reloadScripts();
 
-		editor.timeline.reset();
-		editor.timeline.update( editor.player.currentTime );
+		frame.timeline.reset();
+		frame.timeline.update( frame.player.currentTime );
 
 	} );
 	reload.setMarginLeft( '4px' );
@@ -134,7 +135,7 @@ function SidebarProject( editor ) {
 
 	function buildEffect( id ) {
 
-		var effect = editor.effects[ id ];
+		var effect = frame.effects[ id ];
 
 		var div = new UIDiv().setMarginBottom( '4px' );
 
@@ -196,8 +197,8 @@ function SidebarProject( editor ) {
 
 	function updateConfig() {
 
-		name.setValue( editor.name );
-		duration.setValue( fromSeconds( editor.duration ) );
+		name.setValue( frame.name );
+		duration.setValue( fromSeconds( frame.duration ) );
 
 	}
 
@@ -205,7 +206,7 @@ function SidebarProject( editor ) {
 
 		scriptsContainer.clear();
 
-		var scripts = editor.scripts;
+		var scripts = frame.scripts;
 
 		for ( let i = 0; i < scripts.length; i ++ ) {
 
@@ -219,7 +220,7 @@ function SidebarProject( editor ) {
 
 		effectsContainer.clear();
 
-		var effects = editor.effects;
+		var effects = frame.effects;
 
 		for ( let i = 0; i < effects.length; i ++ ) {
 

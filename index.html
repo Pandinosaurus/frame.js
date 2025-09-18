@@ -107,6 +107,9 @@
 
 			}
 
+			const player = editor.frame.player;
+			const signals = editor.signals;
+
 			// Short-cuts
 
 			document.addEventListener( 'keydown', function ( event ) {
@@ -119,7 +122,7 @@
 							break;
 						case 69: // CMD + E to export
 							event.preventDefault();
-							editor.signals.exportState.dispatch();
+							signals.exportState.dispatch();
 							break;
 					}
 
@@ -133,34 +136,34 @@
 						event.preventDefault();
 						break;
 					case 32: // space
-						editor.player.isPlaying ? editor.stop() : editor.play();
+						player.isPlaying ? editor.stop() : editor.play();
 						break;
 					case 37: // left
 						event.preventDefault();
-						editor.signals.timeBackward.dispatch();
+						signals.timeBackward.dispatch();
 						break;
 					case 39: // right
 						event.preventDefault();
-						editor.signals.timeForward.dispatch();
+						signals.timeForward.dispatch();
 						break;
 					case 38: // up
 						event.preventDefault();
-						editor.player.playbackRate += 0.1;
-						editor.signals.playbackRateChanged.dispatch( editor.player.playbackRate );
+						player.playbackRate += 0.1;
+						signals.playbackRateChanged.dispatch();
 						break;
 					case 40: // down
 						event.preventDefault();
-						editor.player.playbackRate -= 0.1;
-						editor.player.playbackRate = Math.max( 0, editor.player.playbackRate );
-						editor.signals.playbackRateChanged.dispatch( editor.player.playbackRate );
+						player.playbackRate -= 0.1;
+						player.playbackRate = Math.max( 0, player.playbackRate );
+						signals.playbackRateChanged.dispatch();
 						break;
 					case 189: // -
 						event.preventDefault();
-						editor.signals.timelineZoomOut.dispatch();
+						signals.timelineZoomOut.dispatch();
 						break;
 					case 187: // +
 						event.preventDefault();
-						editor.signals.timelineZoomIn.dispatch();
+						signals.timelineZoomIn.dispatch();
 						break;
 					case 83:
 						break;
@@ -218,11 +221,11 @@
 
 			window.addEventListener( 'resize', function () {
 
-				editor.signals.windowResized.dispatch();
+				signals.windowResized.dispatch();
 
 			} );
 
-			editor.signals.windowResized.dispatch();
+			signals.windowResized.dispatch();
 
 		</script>
 	</body>

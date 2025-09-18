@@ -6,7 +6,8 @@ import { UIButton, UIPanel, UIRow, UIText } from './libs/ui.js';
 
 function Controls( editor ) {
 
-	var signals = editor.signals;
+	const player = editor.frame.player;
+	const signals = editor.signals;
 
 	var container = new UIPanel();
 	container.setId( 'controls' );
@@ -23,7 +24,7 @@ function Controls( editor ) {
 	prevButton.setVerticalAlign( 'middle' );
 	prevButton.onClick( function () {
 
-		editor.setTime( editor.player.currentTime - 1 );
+		editor.setTime( player.currentTime - 1 );
 
 	} );
 	row.add( prevButton );
@@ -36,7 +37,7 @@ function Controls( editor ) {
 	playButton.setVerticalAlign( 'middle' );
 	playButton.onClick( function () {
 
-		editor.player.isPlaying ? editor.stop() : editor.play();
+		player.isPlaying ? editor.stop() : editor.play();
 
 	} );
 	row.add( playButton );
@@ -49,7 +50,7 @@ function Controls( editor ) {
 	nextButton.setVerticalAlign( 'middle' );
 	nextButton.onClick( function () {
 
-		editor.setTime( editor.player.currentTime + 1 );
+		editor.setTime( player.currentTime + 1 );
 
 	} );
 	row.add( nextButton );
@@ -91,9 +92,9 @@ function Controls( editor ) {
 	playbackRateText.setValue( '1.0x' );
 	row.add( playbackRateText );
 
-	function updatePlaybackRateText( value ) {
+	function updatePlaybackRate() {
 
-		playbackRateText.setValue( value.toFixed( 1 ) + 'x' );
+		playbackRateText.setValue( player.playbackRate.toFixed( 1 ) + 'x' );
 
 	}
 
@@ -118,15 +119,21 @@ function Controls( editor ) {
 
 	} );
 
-	signals.playbackRateChanged.add( function ( value ) {
+	signals.playbackRateChanged.add( function () {
 
-		updatePlaybackRateText( value );
+		updatePlaybackRate();
 
 	} );
 
 	signals.timeChanged.add( function ( value ) {
 
 		updateTimeText( value );
+
+	} );
+
+	signals.editorCleared.add( function () {
+
+		updatePlaybackRate();
 
 	} );
 

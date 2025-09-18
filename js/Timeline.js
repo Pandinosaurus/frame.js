@@ -9,8 +9,10 @@ import { TimelineCurves } from './TimelineCurves.js';
 
 function Timeline( editor ) {
 
-	var signals = editor.signals;
-	var player = editor.player;
+	const frame = editor.frame;
+	const player = editor.frame.player;
+
+	const signals = editor.signals;
 
 	var container = new UIPanel();
 	container.setId( 'timeline' );
@@ -79,7 +81,7 @@ function Timeline( editor ) {
 
 		context.translate( - scroller.scrollLeft, 0 );
 
-		var duration = editor.duration;
+		var duration = frame.duration;
 		var width = duration * scale;
 		var scale4 = scale / 4;
 
@@ -137,7 +139,7 @@ function Timeline( editor ) {
 
 	function updateContainers() {
 
-		var width = editor.duration * scale;
+		var width = frame.duration * scale;
 
 		elements.setWidth( width + 'px' );
 		curves.setWidth( width + 'px' );
@@ -196,7 +198,7 @@ function Timeline( editor ) {
 		timeMark.style.left = offsetLeft + 'px';
 
 		/*
-		if ( editor.player.isPlaying ) {
+		if ( frame.player.isPlaying ) {
 
 			var timelineWidth = timeline.dom.offsetWidth - 8;
 
@@ -263,7 +265,6 @@ function Timeline( editor ) {
 
 	signals.timeBackward.add( function () {
 
-		const player = editor.player;
 		const time = player.currentTime - ( 32 / scale );
 
 		editor.setTime( time );
@@ -273,7 +274,6 @@ function Timeline( editor ) {
 
 	signals.timeForward.add( function () {
 
-		const player = editor.player;
 		const time = player.currentTime + ( 32 / scale );
 
 		editor.setTime( time );

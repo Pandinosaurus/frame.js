@@ -16,7 +16,7 @@ function Viewport( editor ) {
 
 	editor.signals.fullscreen.add( function () {
 
-		var element = container.dom.firstChild;
+		var element = container.dom;
 
 		if ( element.requestFullscreen ) element.requestFullscreen();
 		if ( element.msRequestFullscreen ) element.msRequestFullscreen();

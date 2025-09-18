@@ -143,6 +143,13 @@ function Resources() {
 
 		set: function ( name, resource ) {
 
+			if ( 'name' in resources ) {
+
+				console.error( 'Resource already exists: ' + name );
+				return;
+
+			}
+
 			resources[ name ] = resource;
 
 		}
